@@ -3,14 +3,13 @@ name: Deploy to Amazon ECS
 on:
   push:
     branches:
-      - main
+      - "**"
 
 jobs:
   deploy:
-    # if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
     name: Deploy on ECS
     runs-on: ubuntu-18.04
-    needs: [build]
     env:
       ECR_REGISTRY: ${{ secrets.ECR_URI }}
       IMAGE_TAG: latest
@@ -35,14 +34,14 @@ jobs:
         echo "::set-output name=image::$ECR_REGISTRY:$IMAGE_TAG"
     - name: Download task definition
       run: |
-        aws ecs describe-task-definition --task-definition concert_curation_runner \
+        aws ecs describe-task-definition --task-definition cc_recommendation_engine_runner \
         --query taskDefinition > task-definition.json
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: task-definition.json
-        container-name: concert_curation_app
+        container-name: cc_recommendation_engine
         image: ${{ steps.build-image.outputs.image }}
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
