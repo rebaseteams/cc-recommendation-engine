@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, request
 
 from app.artistRecommendation.service import ArtistRecommendationService
 
@@ -10,9 +10,10 @@ class ArtistRecommendationRoute:
     def __createBlueprint(self):
         blueprint = Blueprint('artist-recommendation', __name__)
 
-        @blueprint.route("/")
-        def test():
-            result = self.__artistRecommendationService.getRecommendation()
+        @blueprint.route("", methods=["POST"])
+        def predict():
+            data = request.get_json()
+            result = self.__artistRecommendationService.getRecommendation(data)
             return result
 
         return blueprint
