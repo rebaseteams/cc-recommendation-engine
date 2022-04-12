@@ -4,5 +4,5 @@ class ArtistRecommendationService:
     def __init__(self, recommendationRepo):
         self.recommendationRepo: ArtistRecommendationRepo = recommendationRepo
 
-    def getRecommendation(self):
-        return self.recommendationRepo.getRecommendation()
+    def getRecommendation(self, data):
+        return self.recommendationRepo.getRecommendation(data)
