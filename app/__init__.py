@@ -20,7 +20,7 @@ else:
 
 services = server.config["services"]
 
-app.register_blueprint(liveCheck, url_prefix="/live-check")
+app.register_blueprint(liveCheck, url_prefix="/live_check")
 app.register_blueprint(
     ArtistRecommendationRoute(services["artistRecommendationService"]).blueprint, 
     url_prefix="/artist-recommendation"
