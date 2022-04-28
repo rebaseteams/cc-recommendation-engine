@@ -17,6 +17,9 @@ def recommendation(abc ,event_artist,genre_event,venue_db,genre):
     max1=frame_1[idx]
     max2 = max1.sort_values(by='popularity',ascending=False , ignore_index = True)
     max3 = max2.drop_duplicates(subset = 'artist_id',ignore_index = True)
-    return max3
+    max3['rating'] = max3['popularity']*0.7
+    max3 = max3[['artist_id' , 'rating']]
+    final_data = max3.head(10)
+    return final_data
 
 
