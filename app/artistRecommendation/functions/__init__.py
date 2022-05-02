@@ -4,22 +4,32 @@ import pandas as pd
 import json
 
 
-def recommendation(abc ,event_artist,genre_event,venue_db,genre):
-    venues_list=find_artist_from_venue(find_venues(abc , venue_db), event_artist)
-    genre_list=find_genre_artist(abc, genre , genre_event)
-    ab = pd.concat([venues_list , genre_list])
-    list1=list(set(ab['artist_id'].tolist()))
-    data1 = genre_event[genre_event['artist_id'].isin(list1)]
-    list2=list(set(data1['genre_id'].tolist()))
-    data2 = genre_event[genre_event['genre_id'].isin(list2)]
-    frame_1 = data2[data2['approx_budget'].between(int(abc['artistBudget']['min']) , int(abc['artistBudget']['max']))]
-    idx = frame_1.groupby(['artist_id'])['approx_budget'].transform(max) == frame_1['approx_budget']
-    max1=frame_1[idx]
-    max2 = max1.sort_values(by='popularity',ascending=False , ignore_index = True)
-    max3 = max2.drop_duplicates(subset = 'artist_id',ignore_index = True)
-    max3['rating'] = max3['popularity']*0.7
-    max3 = max3[['artist_id' , 'rating']]
-    final_data = max3.head(10)
-    return final_data
+def recommendation(body ,event_artist,genre_event,venue_db,genre):
+    if 'venue' in body:
+        venues_list=find_artist_from_venue(find_venues(body , venue_db), event_artist)
+    else:
+        venues_list = pd.DataFrame() 
+
+    
+    if 'targetAudience' in body:
+        if 'genre' in body["targetAudience"]:
+            genre_list=find_genre_artist(body, genre , genre_event)
+        else:  
+            genre_list = pd.DataFrame()      
+
+    combine_functions = pd.concat([venues_list , genre_list])
+    list_combine_functions =list(set(combine_functions['artist_id'].tolist()))
+    data_of_artist_1 = genre_event[genre_event['artist_id'].isin(list_combine_functions)]
+    list_of_genre=list(set(data_of_artist_1['genre_id'].tolist()))
+    data_of_artist_2 = genre_event[genre_event['genre_id'].isin(list_of_genre)]
+    budget_frame = data_of_artist_2[data_of_artist_2['approx_budget'].between(int(body['artistBudget']['min']) , int(body['artistBudget']['max']))]
+    groupby_artist_id = budget_frame.groupby(['artist_id'])['approx_budget'].transform(max) == budget_frame['approx_budget']
+    sorted_budget_frame = budget_frame[groupby_artist_id]
+    sort_by_popularity = sorted_budget_frame.sort_values(by='popularity',ascending=False , ignore_index = True)
+    drop_duplicate_artist = sort_by_popularity.drop_duplicates(subset = 'artist_id',ignore_index = True)
+    drop_duplicate_artist['matchPercentage'] = drop_duplicate_artist['popularity']*0.7
+    drop_duplicate_artist = drop_duplicate_artist[['artist_id' , 'matchPercentage']]
+    recommend_artist = drop_duplicate_artist.head(10)
+    return recommend_artist
 
 
