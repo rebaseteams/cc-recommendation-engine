@@ -4,8 +4,8 @@ pd.set_option('mode.chained_assignment', None)
 
 def find_genre(body,genre ):
     genre_list = []
-    for i in range(len(body['target_audience']['genre'])):
-        genre_id = genre[genre['name'] == body['target_audience']['genre'][i]['genreId']]
+    for i in range(len(body['targetAudience']['genre'])):
+        genre_id = genre[genre['name'] == body['targetAudience']['genre'][i]['genreName']]
         if len(genre_id)>0:
             genre1 = genre_id['id'].values[0]
             genre_list.append(genre1)
