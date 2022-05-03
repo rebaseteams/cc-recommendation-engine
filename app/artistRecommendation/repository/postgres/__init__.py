@@ -1,13 +1,23 @@
 from flask import jsonify
 import pandas as pd
+from sqlalchemy import MetaData, Table
 from app.artistRecommendation.functions import recommendation
 from app.utils.loadTableDf import loadTableDf
+from sqlalchemy.orm import Query
+import sqlalchemy as db
+
+
+meta = MetaData()
 
 class ArtistRecommendationRepo:
     def __init__(self, connection):
         self.connection = connection
     
     def getRecommendation(self, data):
+        table = Table('artist_recommendation', meta, autoload=True, autoload_with=self.connection)
+        stmt = Query(table).filter_by(id = data["id"])
+        qr = db.select([table]).filter_by(id = data["id"])
+        recomm = self.connection.execute(qr).first()._asdict()
         venue_db= loadTableDf('venue', self.connection)
         event =loadTableDf('events' , self.connection)
         genre =loadTableDf('genre' , self.connection)
@@ -24,7 +34,7 @@ class ArtistRecommendationRepo:
         genre_artist = genre_artist[['artist_id', 'genre_id','event_id','popularity']]
         genre_event = pd.merge(genre_artist , event , how = 'inner' , on = 'event_id')
         genre_event = genre_event[['artist_id','popularity', 'genre_id', 'event_id','approx_budget']]
-        output = recommendation(data ,event_artist , genre_event,venue_db,genre)
+        output = recommendation(recomm ,event_artist , genre_event,venue_db,genre)
         final_result =  output.to_json(orient = 'records' , lines=True).replace('\n' , ' ')
         
         return final_result
