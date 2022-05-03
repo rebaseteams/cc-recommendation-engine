@@ -12,7 +12,7 @@ meta = MetaData()
 class ArtistRecommendationRepo:
     def __init__(self, connection):
         self.connection = connection
-      
+    
     def getRecommendation(self, data):
         table = Table('artist_recommendation', meta, autoload=True, autoload_with=self.connection)
         stmt = Query(table).filter_by(id = data["id"])
