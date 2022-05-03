@@ -3,8 +3,8 @@ pd.set_option('mode.chained_assignment', None)
 
 def find_venues(v,venue):
     list1 = []
-    for i in range(len(v['venue'])):
-        find_name = venue[venue['name'] == v['venue'][i]['name']]
+    for i in range(len(v['venue_id'])):
+        find_name = venue[venue['id'] == v['venue_id'][i]]
         find_id = find_name['id'].values[0]
         list1.append(find_id)
 
@@ -18,7 +18,3 @@ def find_artist_from_venue(v ,event_artist):
         data = data.append(list_artist)
         
     return data
-
-
-
-
