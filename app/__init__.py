@@ -23,7 +23,7 @@ services = server.config["services"]
 app.register_blueprint(liveCheck, url_prefix="/reco-engine/live_check")
 app.register_blueprint(
     ArtistRecommendationRoute(services["artistRecommendationService"]).blueprint, 
-    url_prefix="/reco-engine/artist-recommendation"
+    url_prefix="/reco-engine/artist-recommendation")
 
 @app.route("/")
 def home():    
