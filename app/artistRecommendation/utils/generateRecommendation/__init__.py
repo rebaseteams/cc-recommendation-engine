@@ -1,16 +1,17 @@
 from random import randint
 from sqlalchemy import MetaData, Table
 import sqlalchemy as db
+import pandas as pd
 
 meta = MetaData()
 
 def artistMapper(arts):
     return {
-        "artistName": arts["name"],
+        "artistName": arts['name'],
         "artistId":  arts["id"],
         "artistImage": arts["image"],
         "artistGender": arts["gender"],
-        "matchPercentage": 32, # actual percentage,
+        "matchPercentage": arts['matchPercentage'], # actual percentage,
         "matchAttributes": {
             "venues": [
                 {
@@ -79,7 +80,11 @@ def artistMapper(arts):
 
 def generateRecommendation(_artists, connection):
     table = Table('artist', meta, autoload=True, autoload_with=connection)
-    qr = db.select([table]).filter(table.c.id.in_(('02559158-1091-4adf-8850-9fceeb4e9a78', '03f6e371-2a82-411c-b749-c8b653551640')))
+    qr = db.select([table]).filter(table.c.id.in_((list(_artists['artist_id']))))
     recomm = connection.execute(qr).fetchall()
     artists = [dict(row) for row in recomm]
-    final_arts = map(artistMapper, artists)
+    artist_data = pd.merge(pd.DataFrame(artists) , _artists.rename(columns={'artist_id':'id'}), on = 'id')
+    artists_1 = artist_data.to_dict('records')
+    final_arts = map(artistMapper, artists_1)
+    final_artist_data = list(final_arts)
+    return final_artist_data
