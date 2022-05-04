@@ -4,10 +4,8 @@ from sqlalchemy import MetaData, Table
 from app.artistRecommendation.functions import recommendation 
 from app.artistRecommendation.utils.generateRecommendation import generateRecommendation
 from app.utils.loadTableDf import loadTableDf
-from sqlalchemy.orm import Query
 import sqlalchemy as db
 import json
-
 
 meta = MetaData()
 
@@ -17,7 +15,6 @@ class ArtistRecommendationRepo:
     
     def getRecommendation(self, data):
         table = Table('artist_recommendation', meta, autoload=True, autoload_with=self.connection)
-        stmt = Query(table).filter_by(id = data["id"])
         qr = db.select([table]).filter_by(id = data["id"])
         recomm = self.connection.execute(qr).first()._asdict()
         venue_db= loadTableDf('venue', self.connection)
@@ -38,6 +35,8 @@ class ArtistRecommendationRepo:
         genre_event = genre_event[['artist_id','popularity', 'genre_id', 'event_id','approx_budget']]
         output = recommendation(recomm ,event_artist , genre_event,venue_db,genre)
         result = generateRecommendation(output , self.connection)
-        final_result =  json.dumps(result)
-        return final_result
+        st = db.update(table).where(table.c.id == data["id"]).values(artists = result, status = True)
+        recomm = self.connection.execute(st)
+        # final_result =  json.dumps(result)
+        return {"success": True}
         

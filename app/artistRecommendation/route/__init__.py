@@ -12,8 +12,11 @@ class ArtistRecommendationRoute:
 
         @blueprint.route("", methods=["POST"])
         def predict():
-            data = request.get_json()
-            result = self.__artistRecommendationService.getRecommendation(data)
-            return result
+            try:
+                data = request.get_json()
+                result = self.__artistRecommendationService.getRecommendation(data)
+                return result
+            except:
+                return {"success": False}
 
         return blueprint
