@@ -17,6 +17,9 @@ class ArtistRecommendationRoute:
                 result = self.__artistRecommendationService.getRecommendation(data)
                 return result
             except:
-                return {"success": False}
+                return {
+                "error": True,
+                "message": "Somthing went wrong"
+                }
 
         return blueprint
