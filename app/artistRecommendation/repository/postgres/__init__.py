@@ -35,8 +35,25 @@ class ArtistRecommendationRepo:
         genre_event = genre_event[['artist_id','popularity', 'genre_id', 'event_id','approx_budget']]
         output = recommendation(recomm ,event_artist , genre_event,venue_db,genre)
         result = generateRecommendation(output , self.connection)
-        st = db.update(table).where(table.c.id == data["id"]).values(artists = result, status = True)
-        recomm = self.connection.execute(st)
         # final_result =  json.dumps(result)
-        return {"success": True}
+        if len(result) < 10:
+            if recomm['status'] == True :
+                st = db.update(table).where(table.c.id == data["id"]).values(status = False)
+                recomm = self.connection.execute(st)
+                return {
+                    "error": False,
+                    "message": "Recommendations generated less than 10, Recommendations disabled sucessfully"
+                    }
+            else: 
+                return {
+                    "error": False,
+                    "message": "Recommendations generated are less than 10"
+                    }
+        if len(result) >= 10:
+            st = db.update(table).where(table.c.id == data["id"]).values(artists = result, status = True)
+            recomm = self.connection.execute(st)
+            return {
+                "error": False,
+                "message": "Recommendations updated sucessfully"
+                }
         
