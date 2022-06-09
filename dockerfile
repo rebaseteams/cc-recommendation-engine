@@ -10,6 +10,7 @@ RUN pip install psycopg2-binary
 RUN pip install flask
 RUN pip install SQLAlchemy
 RUN pip install pandas
+RUN pip install boto3
 RUN apk add g++
 
 WORKDIR /app
