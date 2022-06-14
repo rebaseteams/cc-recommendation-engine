@@ -37,23 +37,13 @@ class ArtistRecommendationRepo:
         result = generateRecommendation(output , self.connection)
         # final_result =  json.dumps(result)
         if len(result) < 10:
-            if recomm['status'] == True :
-                st = db.update(table).where(table.c.id == data["id"]).values(status = False)
-                recomm = self.connection.execute(st)
-                return {
-                    "error": False,
-                    "message": "Recommendations generated less than 10, Recommendations disabled sucessfully"
-                    }
-            else: 
-                return {
-                    "error": False,
-                    "message": "Recommendations generated are less than 10"
-                    }
-        if len(result) >= 10:
-            st = db.update(table).where(table.c.id == data["id"]).values(artists = result, status = True)
-            recomm = self.connection.execute(st)
             return {
-                "error": False,
-                "message": "Recommendations updated sucessfully"
-                }
-        
+                "status": False,
+                "message": "Recommendations generated are less than 10"
+            }
+        if len(result) >= 10:
+            return {
+                "status": True,
+                "message": "Recommendations generated sucessfully"
+            }
+                    
