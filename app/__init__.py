@@ -19,6 +19,12 @@ sqs = boto3.client(
     aws_secret_access_key=environ.get('AWS_SECRET_KEY'),
     region_name = environ.get('AWS_REGION'),
 )
+sns = boto3.client(
+    'sns',
+    aws_access_key_id=environ.get('AWS_ACCESS_KEY'),
+    aws_secret_access_key=environ.get('AWS_SECRET_KEY'),
+    region_name = environ.get('AWS_REGION'),
+)
 
 if (environ.get('FLASK_ENV') == "production"):
     server = ProductionServer()
@@ -57,20 +63,25 @@ def retrieveMessages():
         else:
             body = pd.DataFrame([messages])
             id=pd.DataFrame([json.loads(body["Message"][0])])["id"][0]
-            print(id)
 
         try:
             genRecommendation= services["artistRecommendationService"].getRecommendation({"id": id})
-            print(genRecommendation)
+            if genRecommendation: 
+                message = { "id": id, "status": genRecommendation['status'], "message": genRecommendation['message']}
         except:
-            print('Generate Recommendation Failed')
+            message = { "id": id, "status": False, "message": "Something went wrong"}
         finally:
+            arn = environ.get('TopicARN_SNS_Recommendation_Processed')
+            sns.publish(
+                TopicArn=arn,
+                Message=json.dumps({'default': json.dumps(message)}),
+                MessageStructure='json'
+            )  
             receiptHandle=response['Messages'][0]['ReceiptHandle']
-            delete_message= sqs.delete_message(
+            sqs.delete_message(
                 QueueUrl=queue_url,
                 ReceiptHandle=receiptHandle,
             )
-            print('deleted_message', delete_message)
     else:
         return print('No Messages available in queue')
             
