@@ -84,7 +84,8 @@ def generateRecommendation(_artists, connection):
     recomm = connection.execute(qr).fetchall()
     artists = [dict(row) for row in recomm]
     artist_data = pd.merge(pd.DataFrame(artists) , _artists.rename(columns={'artist_id':'id'}), on = 'id')
-    artists_1 = artist_data.to_dict('records')
+    artist_data_2 = artist_data.sort_values(by='matchPercentage',ascending=False , ignore_index = True).head(10)
+    artists_1 = artist_data_2.to_dict('records')
     final_arts = map(artistMapper, artists_1)
     final_artist_data = list(final_arts)
     return final_artist_data

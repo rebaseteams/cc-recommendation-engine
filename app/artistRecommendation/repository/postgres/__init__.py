@@ -35,7 +35,6 @@ class ArtistRecommendationRepo:
         genre_event = genre_event[['artist_id','popularity', 'genre_id', 'event_id','approx_budget']]
         output = recommendation(recomm ,event_artist , genre_event,venue_db,genre)
         result = generateRecommendation(output , self.connection)
-        # final_result =  json.dumps(result)
         if len(result) < 10:
             return {
                 "status": False,
