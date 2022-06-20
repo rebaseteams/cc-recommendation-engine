@@ -90,7 +90,7 @@ def setInterval(func,time):
     while not e.wait(time):
         func()
 
-setInterval(retrieveMessages, 30.0)       
+# setInterval(retrieveMessages, 30.0)       
 
 @app.route("/")
 def home():    

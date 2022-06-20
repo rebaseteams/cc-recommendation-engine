@@ -34,7 +34,7 @@ def recommendation(body ,event_artist,genre_event,venue_db,genre):
     else:
         drop_discarded_artist = drop_duplicate_artist
 
-    recommend_artist = drop_discarded_artist.head(10)
+    recommend_artist = drop_discarded_artist.sort_values(by='matchPercentage',ascending=False , ignore_index = True)
     return recommend_artist
 
 
