@@ -41,6 +41,8 @@ class ArtistRecommendationRepo:
                 "message": "Recommendations generated are less than 10"
             }
         if len(result) >= 10:
+            st = db.update(table).where(table.c.id == data["id"]).values(artists = result)
+            recomm = self.connection.execute(st)
             return {
                 "status": True,
                 "message": "Recommendations generated sucessfully"
