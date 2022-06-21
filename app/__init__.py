@@ -1,11 +1,11 @@
 from flask import Flask
-from app.backgroundTasks import setInterval
 from app.serverDevelopment import DevelopmentServer
 from app.liveCheck.route import liveCheck
 from app.artistRecommendation.route import ArtistRecommendationRoute
 from app.serverProduction import ProductionServer 
 from os import environ
 from app.utils.retrieveMessages import retrieveMessages
+from apscheduler.schedulers.background import BackgroundScheduler
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -26,7 +26,9 @@ app.register_blueprint(
     ArtistRecommendationRoute(services["artistRecommendationService"]).blueprint, 
     url_prefix="/reco-engine/artist-recommendation")    
 
-setInterval(retrieveMessages, 30.0)
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=retrieveMessages, args=[services["artistRecommendationService"]], trigger="interval", seconds=10)
+scheduler.start()
 
 @app.route("/")
 def home():  
