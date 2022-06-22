@@ -11,6 +11,7 @@ RUN pip install flask
 RUN pip install SQLAlchemy
 RUN pip install pandas
 RUN pip install boto3
+RUN pip install APScheduler
 RUN apk add g++
 
 WORKDIR /app
